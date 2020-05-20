@@ -1,6 +1,6 @@
 class Matrix(list):
     def __init__(self, array):
-            list.__init__(self, array)
+        list.__init__(self, array)
 
     def __str__(self) -> str:
         # fix print so lines with bigger numbers dont stick out
@@ -30,7 +30,7 @@ class Matrix(list):
     # Could expand into seperate class that continues generation
     @classmethod
     def from_alg(cls, alg, rows, cols=None):
-        """Takes a function alg(i, j) and uses it to generate values"""
+        """Generate a matrix from an algorithm."""
         if cols is None:
             cols = rows
 
@@ -62,13 +62,13 @@ class Matrix(list):
         return line_str
 
     def scalar_product(self, scalar):
-        """Multiplies a matrix by a scalar"""
+        """Multiply the matrix by a scalar."""
 
         return Matrix([list(map(lambda value: value * scalar, row))
-                      for row in self])
+                       for row in self])
 
     def dot_product(self, other):
-        """Returns the dot product of two matrices"""
+        """Multiply the matrix by another matrix."""
 
         matrix1 = self
         matrix2 = other
@@ -80,7 +80,7 @@ class Matrix(list):
         matrix2_height = len(matrix2)
 
         if matrix1_length != matrix2_height:
-            raise Exception("Incompatible matrices")  # needs more description
+            raise Exception("Incompatible matrices")  # TODO: needs more description
 
         output = []
         for row in range(matrix1_height):
@@ -107,11 +107,12 @@ class Matrix(list):
 
     @property
     def trace(self):
-        """Returns the sum of the values on the current matrix's diagonal"""
+        """Return the sum of the values on the matrix's diagonal."""
         sum(self.diag)
 
     @property
     def inverse(self):
+        """Return the inverse of the matrix, if possible."""
         if self.determinant == 0:
             raise Exception('Matrix determinant is undefined')
         if not self.is_square():
@@ -119,16 +120,14 @@ class Matrix(list):
 
     @property
     def diag(self) -> list:
-        """Returns the set of values in the current matrix
-        where i = j
-        """
+        """Return the diagonal of the matrix."""
+
         return [self[i][i] for i in range(self.rows)]
 
     @property
     def determinant(self):
-        """Returns the determinant of the current matrix based off
-        of its LU decomposition
-        """
+        """Return the determinant of the matrix, if possible."""
+
         if not self.is_square():
             raise Exception('Only square matrices have determinants')
 
@@ -142,13 +141,16 @@ class Matrix(list):
 
     @property
     def LUdecomposition(self):
-        """Uses Doolittle's Algorithm to find the decomposition
-        of the current matrix A into a pair of upper and lower
-        triangular matrices such that A = LU
         """
+        Decompose a matrix into a pair of triangular matrices.
+
+        Use Doolittle's Algorithm to find the decomposition
+        of the matrix (A) into a pair of upper (U) and
+        lower (L) triangular matrices such that A = LU
+        """
+
         lower = Matrix.generate_null(self.rows, self.cols)
         upper = Matrix.from_matrix(lower)
-        # TODO add matrix .clone() functionality
 
         for i in range(self.rows):
             for k in range(i, self.rows):
@@ -160,16 +162,16 @@ class Matrix(list):
                     lower[i][i] = 1
                 else:
                     summation = sum([lower[k][j] * upper[j][i]
-                                    for j in range(i)])
+                                     for j in range(i)])
                     lower[k][i] = (self[k][i] - summation) // upper[i][i]
         return {
             'lower': lower,
-            'upper': upper
+            'upper': upper,
         }
 
     @property
     def transpose(self):
-        """Returns the transpose of the current matrix"""
+        """Return the transpose of the matrix."""
 
         return Matrix(map(list, zip(*self)))
 
@@ -184,7 +186,7 @@ class IdentityMatrix(Matrix):
             raise Exception('Identity matrices must be square')
 
         array = [[1 if i == j else 0
-                 for j in range(cols)]
+                  for j in range(cols)]
                  for i in range(rows)]
 
         Matrix.__init__(self, array)
@@ -225,10 +227,11 @@ class PascalMatrix(Matrix):
 
         from math import factorial as fact
 
-        def pascal(i, j): return fact(i + j) // (fact(i) * fact(j))
+        def pascal(i, j):
+            return fact(i + j) // (fact(i) * fact(j))
 
         array = [[pascal(i, j)
-                 for j in range(cols)]
+                  for j in range(cols)]
                  for i in range(rows)]
 
         Matrix.__init__(self, array)
@@ -249,4 +252,4 @@ if __name__ == "__main__":
 
     m2 = Matrix.from_alg(f, 20)
 
-    print(m2)
+    print(IdentityMatrix(5))
